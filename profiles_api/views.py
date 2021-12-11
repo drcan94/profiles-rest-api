@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.filters import SearchFilter
 
 from .serializers import HelloSerializer, UserProfileSerializer
 from .models import UserProfile
@@ -35,7 +36,7 @@ class HelloApiView(APIView):
         else:
             return Response(
                 serializer.errors,
-                status = status.HTTP_400_BAD_REQUEST
+                status = HTTP_400_BAD_REQUEST
             )
 
     def put(self, request, pk=None):
@@ -106,4 +107,8 @@ class UserProfileViewSet(ModelViewSet):
     queryset = UserProfile.objects.all()
 
     authentication_classes = (TokenAuthentication,)
+    # yetkilendirme yöntemini token ile olsun şeklinde belirledik
     permission_classes = (UpdateOwnProfile,)
+
+    filter_backends = (SearchFilter,)
+    search_fields = ('name','email',)
