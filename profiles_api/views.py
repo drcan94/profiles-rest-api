@@ -1,11 +1,12 @@
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
 from .serializers import HelloSerializer
 
 class HelloApiView(APIView):
-    """ Test API View """
+    """ Test APIView """
 
     serializer_class = HelloSerializer
 
@@ -45,3 +46,51 @@ class HelloApiView(APIView):
     def delete(self,request,pk=None):
         """ Delete an Object """
         return Response({'method' : "DELETE"})
+
+
+class HelloViewSet(ViewSet):
+    """ Test ViewSet """
+
+    serializer_class = HelloSerializer
+
+    def list(self, request):
+        """ Return a hello message """
+        a_viewset = [
+            "Uses actions (List, create, retrieve, update, partial_update, destroy)",
+            "Automatically maps to URLs using Routers",
+            "Provides more functionality with less code",
+        ]
+        return Response({
+            'message' : 'Hello!',
+            'a_viewset' : a_viewset
+        })
+
+    def create(self, request):
+        """ Create a new hello message """
+
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            name = serializer.validated_data.get("name")
+            message = f'Hello {name}!'
+            return Response({'message' : message})
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+    def retrieve(self, request, pk=None):
+        """ Handle getting an object by its id """
+        return Response({"http_method" : 'GET'})
+
+    def update(self, request, pk=None):
+        """ Handle updating an object """
+        return Response({'http_method' : 'PUT'})
+
+    def partial_update(self, request, pk=None):
+        """ Handle a partial updating an object """
+        return Response({'http_method' : 'PATCH'})
+
+    def destroy(self, request, pk=None):
+        """ Delete an Object """
+        return Response({'http_method' : 'DELETE'})
